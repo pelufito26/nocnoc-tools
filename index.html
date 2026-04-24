@@ -163,6 +163,7 @@
 
   <div class="btn-row">
     <button class="btn-primary"   onclick="t1Convert('plain')">Sin comillas</button>
+    <button class="btn-primary"   onclick="t1Convert('spaced')">Sin comillas + espacio</button>
     <button class="btn-secondary" onclick="t1Convert('quoted')">Con comillas simples</button>
     <button class="btn-clear"     onclick="t1Clear()">Limpiar</button>
   </div>
@@ -171,6 +172,13 @@
     <div class="output-label">Sin comillas</div>
     <div class="output-box" id="t1-out-plain">
       <button class="copy-inline" onclick="copyEl('t1-out-plain')">copiar</button>
+    </div>
+  </div>
+
+  <div class="output-block" id="t1-out-spaced-wrap" style="display:none">
+    <div class="output-label">Sin comillas + espacio</div>
+    <div class="output-box" id="t1-out-spaced">
+      <button class="copy-inline" onclick="copyEl('t1-out-spaced')">copiar</button>
     </div>
   </div>
 
@@ -223,21 +231,27 @@
     const nums = parseLines('t1-input');
     if (!nums.length) return;
 
-    const btn = `<button class="copy-inline" onclick="copyEl('${mode === 'plain' ? 't1-out-plain' : 't1-out-quoted'}')">copiar</button>`;
+    const idMap = { plain: 't1-out-plain', spaced: 't1-out-spaced', quoted: 't1-out-quoted' };
+    const id = idMap[mode];
+    const btn = `<button class="copy-inline" onclick="copyEl('${id}')">copiar</button>`;
 
     if (mode === 'plain') {
-      setOutput('t1-out-plain-wrap', 't1-out-plain', nums.join(','), btn);
+      setOutput('t1-out-plain-wrap', id, nums.join(','), btn);
+    } else if (mode === 'spaced') {
+      setOutput('t1-out-spaced-wrap', id, nums.join(', '), btn);
     } else {
-      setOutput('t1-out-quoted-wrap', 't1-out-quoted', nums.map(n => `'${n}'`).join(', '), btn);
+      setOutput('t1-out-quoted-wrap', id, nums.map(n => `'${n}'`).join(', '), btn);
     }
   }
 
   function t1Clear() {
     document.getElementById('t1-input').value = '';
-    document.getElementById('t1-out-plain-wrap').style.display  = 'none';
-    document.getElementById('t1-out-quoted-wrap').style.display = 'none';
-    document.getElementById('t1-out-plain').textContent  = '';
-    document.getElementById('t1-out-quoted').textContent = '';
+    ['t1-out-plain-wrap','t1-out-spaced-wrap','t1-out-quoted-wrap'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
+    ['t1-out-plain','t1-out-spaced','t1-out-quoted'].forEach(id => {
+      document.getElementById(id).textContent = '';
+    });
   }
 
   function copyEl(id) {
