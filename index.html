@@ -171,6 +171,7 @@
   <div class="output-block" id="t1-out-plain-wrap" style="display:none">
     <div class="output-label">Sin comillas</div>
     <div class="output-box" id="t1-out-plain">
+      <span id="t1-out-plain-text"></span>
       <button class="copy-inline" onclick="copyEl('t1-out-plain')">copiar</button>
     </div>
   </div>
@@ -178,6 +179,7 @@
   <div class="output-block" id="t1-out-spaced-wrap" style="display:none">
     <div class="output-label">Sin comillas + espacio</div>
     <div class="output-box" id="t1-out-spaced">
+      <span id="t1-out-spaced-text"></span>
       <button class="copy-inline" onclick="copyEl('t1-out-spaced')">copiar</button>
     </div>
   </div>
@@ -185,6 +187,7 @@
   <div class="output-block" id="t1-out-quoted-wrap" style="display:none">
     <div class="output-label">Con comillas simples</div>
     <div class="output-box" id="t1-out-quoted">
+      <span id="t1-out-quoted-text"></span>
       <button class="copy-inline" onclick="copyEl('t1-out-quoted')">copiar</button>
     </div>
   </div>
@@ -203,6 +206,7 @@
   <div class="output-block" id="t2-out-wrap" style="display:none">
     <div class="output-label">Resultado</div>
     <div class="output-box" id="t2-out">
+      <span id="t2-out-text"></span>
       <button class="copy-inline" onclick="copyEl('t2-out')">copiar</button>
     </div>
   </div>
@@ -219,28 +223,21 @@
       .filter(l => l.length > 0);
   }
 
-  function setOutput(wrapId, boxId, text, btnHtml) {
-    const wrap = document.getElementById(wrapId);
-    const box  = document.getElementById(boxId);
-    wrap.style.display = 'block';
-    box.textContent = text;
-    box.insertAdjacentHTML('beforeend', btnHtml);
+  function setOutput(wrapId, boxId, text) {
+    document.getElementById(wrapId).style.display = 'block';
+    document.getElementById(boxId + '-text').textContent = text;
   }
 
   function t1Convert(mode) {
     const nums = parseLines('t1-input');
     if (!nums.length) return;
 
-    const idMap = { plain: 't1-out-plain', spaced: 't1-out-spaced', quoted: 't1-out-quoted' };
-    const id = idMap[mode];
-    const btn = `<button class="copy-inline" onclick="copyEl('${id}')">copiar</button>`;
-
     if (mode === 'plain') {
-      setOutput('t1-out-plain-wrap', id, nums.join(','), btn);
+      setOutput('t1-out-plain-wrap', 't1-out-plain', nums.join(','));
     } else if (mode === 'spaced') {
-      setOutput('t1-out-spaced-wrap', id, nums.join(', '), btn);
+      setOutput('t1-out-spaced-wrap', 't1-out-spaced', nums.join(', '));
     } else {
-      setOutput('t1-out-quoted-wrap', id, nums.map(n => `'${n}'`).join(', '), btn);
+      setOutput('t1-out-quoted-wrap', 't1-out-quoted', nums.map(n => `'${n}'`).join(', '));
     }
   }
 
@@ -249,14 +246,13 @@
     ['t1-out-plain-wrap','t1-out-spaced-wrap','t1-out-quoted-wrap'].forEach(id => {
       document.getElementById(id).style.display = 'none';
     });
-    ['t1-out-plain','t1-out-spaced','t1-out-quoted'].forEach(id => {
+    ['t1-out-plain-text','t1-out-spaced-text','t1-out-quoted-text'].forEach(id => {
       document.getElementById(id).textContent = '';
     });
   }
 
   function copyEl(id) {
-    const el = document.getElementById(id);
-    const text = el.childNodes[0]?.nodeValue || el.textContent.replace('copiar','').trim();
+    const text = document.getElementById(id + '-text').textContent;
     navigator.clipboard.writeText(text).then(showToast);
   }
 
@@ -277,17 +273,14 @@
       return `${d.padStart(2,'0')}/${m.padStart(2,'0')}/${y}`;
     });
 
-    const wrap = document.getElementById('t2-out-wrap');
-    const box  = document.getElementById('t2-out');
-    wrap.style.display = 'block';
-    box.textContent = results.join('\n');
-    box.insertAdjacentHTML('beforeend', `<button class="copy-inline" onclick="copyEl('t2-out')">copiar</button>`);
+    document.getElementById('t2-out-wrap').style.display = 'block';
+    document.getElementById('t2-out-text').textContent = results.join('\n');
   }
 
   function t2Clear() {
     document.getElementById('t2-input').value = '';
     document.getElementById('t2-out-wrap').style.display = 'none';
-    document.getElementById('t2-out').textContent = '';
+    document.getElementById('t2-out-text').textContent = '';
   }
 </script>
 </body>
